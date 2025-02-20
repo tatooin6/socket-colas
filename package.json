@@ -4,13 +4,18 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "node server/server.js"
+        "start": "node server/server.js",
+        "dev": "npx nodemon --ext js,html,css,json server/server.js"
     },
     "author": "",
     "license": "ISC",
     "dependencies": {
         "express": "^4.16.3",
         "socket.io": "^2.0.4"
+    },
+    "devDependencies": {
+        "connect-livereload": "^0.6.1",
+        "livereload": "^0.9.3",
+        "nodemon": "^3.1.9"
     }
 }
