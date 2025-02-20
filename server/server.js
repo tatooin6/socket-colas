@@ -1,5 +1,7 @@
 const express = require("express");
 const path = require("path");
+const http = require("http"); // Necesario para socket.io
+const socketIO = require("socket.io"); // Importar socket.io
 const livereload = require("livereload");
 const connectLivereload = require("connect-livereload");
 
@@ -7,13 +9,17 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const PUBLIC_PATH = path.resolve(__dirname, "../public");
 
+const server = http.createServer(app);
+
+setupSockets(server);
+
 enableLiveReload(app);
 
 setupMiddlewares(app);
 
 serveStaticFiles(app);
 
-startServer(app, PORT);
+startServer(server, PORT);
 
 /**
  * Habilita LiveReload para recargar automaticamente los cambios en el frontend.
@@ -42,7 +48,7 @@ function generateCSP() {
     "default-src 'self' http://localhost:35729",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:35729",
     "style-src 'self' 'unsafe-inline' https://maxcdn.bootstrapcdn.com",
-    "connect-src 'self' ws://localhost:35729",
+    "connect-src 'self' ws://localhost:35729 ws://localhost:3000",
     "img-src 'self' data:",
     "font-src 'self' data:",
   ].join("; ");
@@ -56,10 +62,18 @@ function serveStaticFiles(app) {
 }
 
 /**
- * Inicia el servidor Express en el puerto especificado.
+ * Configura la logica de WebSockets con socket.io.
  */
-function startServer(app, port) {
-  app.listen(port, () => {
+function setupSockets(server) {
+  module.exports.io = socketIO(server);
+  require("./sockets/socket");
+}
+
+/**
+ * Inicia el servidor en el puerto especificado.
+ */
+function startServer(server, port) {
+  server.listen(port, () => {
     console.log(`Servidor corriendo en: http://localhost:${port}`);
   });
 }
